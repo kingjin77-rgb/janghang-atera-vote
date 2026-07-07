@@ -75,20 +75,14 @@ button,input{font-family:var(--font)}
       <button class="refresh-btn" onclick="loadData()">↻ 새로고침</button>
     </div>
 
-    <div class="stat-row">
-      <div class="stat-card"><div class="stat-v" id="stTotal">-</div><div class="stat-lb">참여 세대</div></div>
-      <div class="stat-card"><div class="stat-v" id="stRate">-</div><div class="stat-lb">참여율 (총760세대)</div></div>
-      <div class="stat-card"><div class="stat-v" id="stDongs">-</div><div class="stat-lb">참여 동 수</div></div>
+    <div class="stat-row" style="grid-template-columns:1fr 1fr">
+      <div class="stat-card"><div class="stat-v" id="stTotal">-</div><div class="stat-lb">총 참여 수</div></div>
+      <div class="stat-card"><div class="stat-v" id="stRate">-</div><div class="stat-lb">참여율 (총760세대 추정)</div></div>
     </div>
 
     <div class="card">
       <div class="card-t">선택지별 득표</div>
       <div id="optResults"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-t">동별 참여 현황</div>
-      <div class="dong-grid" id="dongGrid"></div>
     </div>
 
     <button class="export-btn" onclick="exportCSV()">📥 엑셀(CSV) 다운로드</button>
@@ -100,7 +94,6 @@ const GH_OWNER = 'kingjin77-rgb';
 const GH_REPO = 'janghang-atera-vote';
 const OPTIONS = ['한가람로 155','한류월드로 90','장항한강로 150'];
 const TOTAL_UNITS = 760;
-const DONGS = ['301','302','303','304','305','306','307','308'];
 
 const MASTER_PIN = '1234';
 let allVotes = [];
@@ -128,9 +121,9 @@ async function loadData(){
       page++;
     }
     allVotes = items.map(issue => {
-      const m = (issue.body||'').match(/\*\*선택:\*\*\s*(.+?)\n\*\*세대:\*\*\s*(\d+)동\s*(\d+)호/);
+      const m = (issue.body||'').match(/\*\*선택:\*\*\s*(.+)/);
       if(!m) return null;
-      return { option: m[1].trim(), dong: m[2], ho: m[3], ts: issue.created_at };
+      return { option: m[1].trim(), ts: issue.created_at };
     }).filter(Boolean);
     render();
   }catch(e){
@@ -141,11 +134,8 @@ async function loadData(){
 
 function render(){
   const total = allVotes.length;
-  document.getElementById('stTotal').textContent = total.toLocaleString() + '세대';
+  document.getElementById('stTotal').textContent = total.toLocaleString() + '표';
   document.getElementById('stRate').textContent = (TOTAL_UNITS ? Math.round(total/TOTAL_UNITS*1000)/10 : 0) + '%';
-
-  const dongSet = new Set(allVotes.map(v=>v.dong));
-  document.getElementById('stDongs').textContent = dongSet.size + '개동';
 
   const optCounts = {};
   OPTIONS.forEach(o=>optCounts[o]=0);
@@ -155,26 +145,17 @@ function render(){
     const cnt = optCounts[opt]||0;
     const pct = total ? Math.round(cnt/total*1000)/10 : 0;
     return `<div class="opt-row">
-      <div class="opt-top"><span>${opt}</span><span>${pct}% (${cnt}세대)</span></div>
+      <div class="opt-top"><span>${opt}</span><span>${pct}% (${cnt}표)</span></div>
       <div class="opt-bar"><div class="opt-fill" style="width:${pct}%"></div></div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('dongGrid').innerHTML = DONGS.map(d=>{
-    const cnt = allVotes.filter(v=>v.dong===d).length;
-    return `<div class="dong-cell">
-      <div class="dong-n">${d}동</div>
-      <div class="dong-c">${cnt}</div>
-      <div class="dong-p">세대 참여</div>
     </div>`;
   }).join('');
 }
 
 function exportCSV(){
   if(!allVotes.length){ alert('내보낼 데이터가 없습니다'); return; }
-  const rows = [['동','호수','선택','접수일시']];
-  [...allVotes].sort((a,b)=> a.dong.localeCompare(b.dong) || (+a.ho - +b.ho))
-    .forEach(v=>rows.push([v.dong, v.ho, v.option, new Date(v.ts).toLocaleString('ko-KR')]));
+  const rows = [['선택','접수일시']];
+  [...allVotes].sort((a,b)=> new Date(a.ts) - new Date(b.ts))
+    .forEach(v=>rows.push([v.option, new Date(v.ts).toLocaleString('ko-KR')]));
   const csv = '\ufeff' + rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
