@@ -93,10 +93,6 @@ img{max-width:100%;display:block}
       <label class="vote-opt" data-v="한류월드로 90"><input type="radio" name="road" value="한류월드로 90"><span class="vote-opt-label">② 한류월드로 90</span></label>
       <label class="vote-opt" data-v="장항한강로 150"><input type="radio" name="road" value="장항한강로 150"><span class="vote-opt-label">③ 장항한강로 150</span></label>
 
-      <div class="unit-row">
-        <input type="text" id="fDong" class="unit-input" placeholder="동 (예: 301)" inputmode="numeric">
-        <input type="text" id="fHo" class="unit-input" placeholder="호수 (예: 1204)" inputmode="numeric">
-      </div>
       <button class="vote-btn" id="submitBtn" onclick="submitVote()">투표하기</button>
     </div>
 
@@ -190,45 +186,30 @@ function renderResults(tally){
   }).join('') + `<div class="result-total">총 ${total.toLocaleString()}표 참여</div>`;
 }
 
-async function checkDuplicate(dong, ho){
-  try{
-    const q = encodeURIComponent(`repo:${GH_OWNER}/${GH_REPO} in:title "${dong}동 ${ho}호" label:투표`);
-    const r = await fetch(`https://api.github.com/search/issues?q=${q}`);
-    if(!r.ok) return false;
-    const data = await r.json();
-    return (data.items && data.items.length > 0);
-  }catch(e){ return false; }
-}
+const VOTED_KEY = 'janghang_road_vote_done';
 
 async function submitVote(){
   if(isClosed()){ toast('투표가 마감되었습니다'); return; }
   if(!selectedOption){ toast('선호하는 도로명을 선택해 주세요'); return; }
-  const dong = document.getElementById('fDong').value.trim().replace(/\D/g,'');
-  const ho = document.getElementById('fHo').value.trim().replace(/\D/g,'');
-  if(!dong || !ho){ toast('동/호수를 입력해 주세요'); return; }
-
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.textContent = '확인 중…';
-
-  const dup = await checkDuplicate(dong, ho);
-  if(dup){
-    btn.disabled = false; btn.textContent = '투표하기';
-    toast(`📋 ${dong}동 ${ho}호는 이미 투표하셨습니다`);
+  if(localStorage.getItem(VOTED_KEY)){
+    toast('이미 이 기기에서 투표하셨습니다');
     return;
   }
 
-  btn.textContent = '제출 중…';
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '제출 중…';
   try{
     const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({title: VOTE_TITLE, option: selectedOption, dong, ho})
+      body: JSON.stringify({title: VOTE_TITLE, option: selectedOption})
     });
     if(!res.ok) throw new Error('전송 실패');
 
+    localStorage.setItem(VOTED_KEY, '1');
     document.getElementById('voteForm').style.display = 'none';
     document.getElementById('doneBox').style.display = 'block';
-    document.getElementById('doneMsg').textContent = `${dong}동 ${ho}호 · "${selectedOption}" 에 투표하셨습니다.`;
+    document.getElementById('doneMsg').textContent = `"${selectedOption}" 에 투표하셨습니다.`;
     const tally = await fetchTally();
     if(tally) renderResults(tally);
   }catch(e){
