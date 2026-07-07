@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>관리자 · 도로명주소 투표 현황</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+:root{
+  --brand:#0D5C30; --brand2:#1A7A42; --brand3:#2EA055; --brand-soft:#E8F5ED;
+  --ink:#0A1A10; --ink2:#2D4535; --ink3:#5A7060; --ink4:#93AC9D; --ink5:#DCE8E0;
+  --bg:#F4F9F6; --surface:#FFFFFF; --surface2:#F5FAF7;
+  --r:14px; --r-sm:9px; --r-lg:18px;
+  --sh-md:0 10px 30px rgba(13,92,48,.14);
+  --font:'Pretendard',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px;line-height:1.6}
+button,input{font-family:var(--font)}
+.wrap{max-width:720px;margin:0 auto;padding:24px 18px 60px}
+
+#lockScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.lock-card{max-width:380px;width:100%;background:var(--surface);border-radius:var(--r-lg);padding:34px 30px;box-shadow:var(--sh-md);text-align:center}
+.lock-emblem{width:52px;height:52px;border-radius:15px;background:linear-gradient(135deg,var(--brand),var(--brand3));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:20px;margin:0 auto 16px}
+.lock-t{font-size:16px;font-weight:800;margin-bottom:18px}
+.lock-input{width:100%;padding:13px;border:1.5px solid var(--ink5);border-radius:var(--r-sm);text-align:center;letter-spacing:.3em;font-size:18px;font-weight:700;margin-bottom:10px}
+.lock-btn{width:100%;padding:13px;border-radius:var(--r-sm);background:var(--brand);color:#fff;font-weight:800;cursor:pointer}
+
+#dash{display:none}
+.hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.hd-t{font-size:18px;font-weight:900}
+.refresh-btn{background:var(--surface);border:1px solid var(--ink5);border-radius:var(--r-sm);padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer}
+
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.stat-card{background:var(--surface);border-radius:var(--r);padding:16px;box-shadow:var(--sh-md);text-align:center}
+.stat-v{font-size:24px;font-weight:900;color:var(--brand)}
+.stat-lb{font-size:11px;color:var(--ink3);font-weight:600;margin-top:4px}
+
+.card{background:var(--surface);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh-md);margin-bottom:16px}
+.card-t{font-size:14px;font-weight:800;margin-bottom:14px;padding-left:9px;border-left:4px solid var(--brand)}
+
+.opt-row{margin-bottom:14px}
+.opt-top{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;margin-bottom:5px}
+.opt-bar{height:10px;background:var(--ink5);border-radius:5px;overflow:hidden}
+.opt-fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand3));border-radius:5px;transition:width .6s ease}
+
+.dong-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.dong-cell{background:var(--surface2);border-radius:var(--r-sm);padding:12px 8px;text-align:center}
+.dong-n{font-size:12px;font-weight:800;color:var(--ink2)}
+.dong-c{font-size:18px;font-weight:900;color:var(--brand);margin-top:4px}
+.dong-p{font-size:10.5px;color:var(--ink4);margin-top:2px}
+
+.export-btn{width:100%;padding:14px;border-radius:var(--r-sm);background:var(--ink);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+.export-btn:hover{background:var(--brand)}
+
+.empty{text-align:center;color:var(--ink4);font-size:13px;padding:20px 0}
+</style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-emblem">JL</div>
+    <div class="lock-t">고양장항아테라 · 투표 관리자</div>
+    <input type="password" id="pinInput" class="lock-input" placeholder="접속코드" maxlength="10" onkeydown="if(event.key==='Enter')unlock()">
+    <button class="lock-btn" onclick="unlock()">접속</button>
+  </div>
+</div>
+
+<div id="dash">
+  <div class="wrap">
+    <div class="hd">
+      <div class="hd-t">📊 도로명주소 투표 현황</div>
+      <button class="refresh-btn" onclick="loadData()">↻ 새로고침</button>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-v" id="stTotal">-</div><div class="stat-lb">참여 세대</div></div>
+      <div class="stat-card"><div class="stat-v" id="stRate">-</div><div class="stat-lb">참여율 (총760세대)</div></div>
+      <div class="stat-card"><div class="stat-v" id="stDongs">-</div><div class="stat-lb">참여 동 수</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-t">선택지별 득표</div>
+      <div id="optResults"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-t">동별 참여 현황</div>
+      <div class="dong-grid" id="dongGrid"></div>
+    </div>
+
+    <button class="export-btn" onclick="exportCSV()">📥 엑셀(CSV) 다운로드</button>
+  </div>
+</div>
+
+<script>
+const GH_OWNER = 'kingjin77-rgb';
+const GH_REPO = 'janghang-atera-vote';
+const OPTIONS = ['한가람로 155','한류월드로 90','장항한강로 150'];
+const TOTAL_UNITS = 760;
+const DONGS = ['301','302','303','304','305','306','307','308'];
+
+const MASTER_PIN = '1234';
+let allVotes = [];
+
+function unlock(){
+  const v = document.getElementById('pinInput').value;
+  if(v === MASTER_PIN){
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('dash').style.display = 'block';
+    loadData();
+  } else {
+    alert('접속코드가 올바르지 않습니다');
+  }
+}
+
+async function loadData(){
+  try{
+    let page = 1, items = [];
+    while(page <= 5){
+      const r = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/issues?labels=${encodeURIComponent('투표')}&state=all&per_page=100&page=${page}`);
+      if(!r.ok) break;
+      const batch = await r.json();
+      items = items.concat(batch);
+      if(batch.length < 100) break;
+      page++;
+    }
+    allVotes = items.map(issue => {
+      const m = (issue.body||'').match(/\*\*선택:\*\*\s*(.+?)\n\*\*세대:\*\*\s*(\d+)동\s*(\d+)호/);
+      if(!m) return null;
+      return { option: m[1].trim(), dong: m[2], ho: m[3], ts: issue.created_at };
+    }).filter(Boolean);
+    render();
+  }catch(e){
+    console.warn(e);
+    alert('데이터를 불러오지 못했습니다');
+  }
+}
+
+function render(){
+  const total = allVotes.length;
+  document.getElementById('stTotal').textContent = total.toLocaleString() + '세대';
+  document.getElementById('stRate').textContent = (TOTAL_UNITS ? Math.round(total/TOTAL_UNITS*1000)/10 : 0) + '%';
+
+  const dongSet = new Set(allVotes.map(v=>v.dong));
+  document.getElementById('stDongs').textContent = dongSet.size + '개동';
+
+  const optCounts = {};
+  OPTIONS.forEach(o=>optCounts[o]=0);
+  allVotes.forEach(v=>{ if(optCounts.hasOwnProperty(v.option)) optCounts[v.option]++; });
+
+  document.getElementById('optResults').innerHTML = OPTIONS.map(opt=>{
+    const cnt = optCounts[opt]||0;
+    const pct = total ? Math.round(cnt/total*1000)/10 : 0;
+    return `<div class="opt-row">
+      <div class="opt-top"><span>${opt}</span><span>${pct}% (${cnt}세대)</span></div>
+      <div class="opt-bar"><div class="opt-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('dongGrid').innerHTML = DONGS.map(d=>{
+    const cnt = allVotes.filter(v=>v.dong===d).length;
+    return `<div class="dong-cell">
+      <div class="dong-n">${d}동</div>
+      <div class="dong-c">${cnt}</div>
+      <div class="dong-p">세대 참여</div>
+    </div>`;
+  }).join('');
+}
+
+function exportCSV(){
+  if(!allVotes.length){ alert('내보낼 데이터가 없습니다'); return; }
+  const rows = [['동','호수','선택','접수일시']];
+  [...allVotes].sort((a,b)=> a.dong.localeCompare(b.dong) || (+a.ho - +b.ho))
+    .forEach(v=>rows.push([v.dong, v.ho, v.option, new Date(v.ts).toLocaleString('ko-KR')]));
+  const csv = '\ufeff' + rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = '고양장항아테라_도로명투표_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>
