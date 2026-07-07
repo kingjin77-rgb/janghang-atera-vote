@@ -55,6 +55,11 @@ button,input{font-family:var(--font)}
 .export-btn:hover{background:var(--brand)}
 
 .empty{text-align:center;color:var(--ink4);font-size:13px;padding:20px 0}
+.donut-wrap{position:relative;width:150px;height:150px;margin:6px auto 10px}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-pct{font-size:26px;font-weight:900;color:var(--brand)}
+.donut-lb{font-size:11px;color:var(--ink3);font-weight:600;margin-top:2px}
+.donut-sub{font-size:12.5px;color:var(--ink3)}
 </style>
 </head>
 <body>
@@ -73,6 +78,21 @@ button,input{font-family:var(--font)}
     <div class="hd">
       <div class="hd-t">📊 도로명주소 투표 현황</div>
       <button class="refresh-btn" onclick="loadData()">↻ 새로고침</button>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <div class="card-t" style="text-align:left">전체 참여 현황</div>
+      <div class="donut-wrap">
+        <svg width="150" height="150" viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="60" fill="none" stroke="#DCE8E0" stroke-width="16"/>
+          <circle id="donutRing" cx="75" cy="75" r="60" fill="none" stroke="#0D5C30" stroke-width="16" stroke-dasharray="0 377" stroke-linecap="round" transform="rotate(-90 75 75)" style="transition:stroke-dasharray .8s ease"/>
+        </svg>
+        <div class="donut-center">
+          <div class="donut-pct" id="donutPct">0%</div>
+          <div class="donut-lb">참여율</div>
+        </div>
+      </div>
+      <div class="donut-sub" id="donutSub">총 760세대 중 0세대 참여</div>
     </div>
 
     <div class="stat-row" style="grid-template-columns:1fr 1fr">
@@ -134,8 +154,15 @@ async function loadData(){
 
 function render(){
   const total = allVotes.length;
+  const rate = TOTAL_UNITS ? Math.round(total/TOTAL_UNITS*1000)/10 : 0;
+
   document.getElementById('stTotal').textContent = total.toLocaleString() + '표';
-  document.getElementById('stRate').textContent = (TOTAL_UNITS ? Math.round(total/TOTAL_UNITS*1000)/10 : 0) + '%';
+  document.getElementById('stRate').textContent = rate + '%';
+
+  document.getElementById('donutPct').textContent = rate + '%';
+  document.getElementById('donutSub').textContent = `총 ${TOTAL_UNITS.toLocaleString()}세대 중 ${total.toLocaleString()}세대 참여`;
+  const circ = 377, dash = circ * Math.min(rate,100) / 100;
+  document.getElementById('donutRing').setAttribute('stroke-dasharray', dash + ' ' + (circ-dash));
 
   const optCounts = {};
   OPTIONS.forEach(o=>optCounts[o]=0);
