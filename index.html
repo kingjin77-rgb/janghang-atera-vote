@@ -23,6 +23,10 @@ button,input{font-family:var(--font)}
 img{max-width:100%;display:block}
 .wrap{max-width:640px;margin:0 auto;padding:24px 18px 60px}
 
+.topbar{display:flex;justify-content:flex-end;max-width:640px;margin:0 auto;padding:14px 18px 0}
+.admin-btn{background:var(--surface);border:1px solid var(--ink5);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--ink3);cursor:pointer}
+.admin-btn:hover{border-color:var(--brand3);color:var(--brand)}
+
 .header{text-align:center;margin-bottom:22px}
 .header-emblem{width:52px;height:52px;border-radius:15px;background:linear-gradient(135deg,var(--brand),var(--brand3));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:20px;margin:0 auto 12px;box-shadow:0 8px 20px rgba(13,92,48,.3)}
 .header-t1{font-size:12px;font-weight:700;color:var(--ink4);letter-spacing:.06em}
@@ -39,15 +43,11 @@ img{max-width:100%;display:block}
 .vote-title{font-size:20px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
 .vote-deadline{font-size:12.5px;color:var(--ink3);margin-bottom:20px}
 
-.vote-opt{display:block;border:1.5px solid var(--ink5);border-radius:var(--r-sm);padding:15px 16px;margin-bottom:10px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:12px}
+.vote-opt{display:flex;align-items:center;gap:12px;border:1.5px solid var(--ink5);border-radius:var(--r-sm);padding:15px 16px;margin-bottom:10px;cursor:pointer;transition:.15s}
 .vote-opt:hover{border-color:var(--brand3)}
 .vote-opt.checked{border-color:var(--brand);background:var(--brand-soft)}
 .vote-opt input{width:18px;height:18px;accent-color:var(--brand);flex-shrink:0}
 .vote-opt-label{font-size:15px;font-weight:700}
-
-.unit-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0}
-.unit-input{padding:12px;border:1.5px solid var(--ink5);border-radius:var(--r-sm);font-size:14px}
-.unit-input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
 
 .vote-btn{width:100%;padding:15px;border-radius:var(--r-sm);background:var(--brand);color:#fff;font-weight:800;font-size:15px;cursor:pointer;transition:.15s;margin-top:6px}
 .vote-btn:hover{background:var(--brand2)}
@@ -72,17 +72,56 @@ img{max-width:100%;display:block}
 .footer{text-align:center;font-size:11.5px;color:var(--ink4);padding:24px 0 10px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:13.5px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;z-index:999;max-width:90%;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+
+/* ── 관리자 모드 ── */
+#adminOverlay{display:none;position:fixed;inset:0;background:rgba(10,26,16,.6);z-index:900;align-items:center;justify-content:center;padding:20px}
+.lock-card{max-width:340px;width:100%;background:var(--surface);border-radius:var(--r-lg);padding:30px 26px;box-shadow:var(--sh-md);text-align:center}
+.lock-t{font-size:15px;font-weight:800;margin-bottom:16px}
+.lock-input{width:100%;padding:13px;border:1.5px solid var(--ink5);border-radius:var(--r-sm);text-align:center;letter-spacing:.3em;font-size:18px;font-weight:700;margin-bottom:10px}
+.lock-btn{width:100%;padding:13px;border-radius:var(--r-sm);background:var(--brand);color:#fff;font-weight:800;cursor:pointer;margin-bottom:8px}
+.lock-cancel{width:100%;padding:10px;background:none;border:none;color:var(--ink4);font-size:12.5px;cursor:pointer}
+
+#adminDash{display:none}
+.hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.hd-t{font-size:18px;font-weight:900}
+.hd-actions{display:flex;gap:8px}
+.icon-btn{background:var(--surface);border:1px solid var(--ink5);border-radius:var(--r-sm);padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer}
+
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.stat-card{background:var(--surface);border-radius:var(--r);padding:16px;box-shadow:var(--sh-md);text-align:center}
+.stat-v{font-size:24px;font-weight:900;color:var(--brand)}
+.stat-lb{font-size:11px;color:var(--ink3);font-weight:600;margin-top:4px}
+
+.card-t{font-size:14px;font-weight:800;margin-bottom:14px;padding-left:9px;border-left:4px solid var(--brand)}
+.opt-row{margin-bottom:14px}
+.opt-top{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;margin-bottom:5px}
+.opt-bar{height:10px;background:var(--ink5);border-radius:5px;overflow:hidden}
+.opt-fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand3));border-radius:5px;transition:width .6s ease}
+
+.donut-wrap{position:relative;width:150px;height:150px;margin:6px auto 10px}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-pct{font-size:26px;font-weight:900;color:var(--brand)}
+.donut-lb{font-size:11px;color:var(--ink3);font-weight:600;margin-top:2px}
+.donut-sub{font-size:12.5px;color:var(--ink3);text-align:center}
+
+.export-btn{width:100%;padding:14px;border-radius:var(--r-sm);background:var(--ink);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+.export-btn:hover{background:var(--brand)}
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<div class="topbar">
+  <button class="admin-btn" onclick="openAdminLock()">🔒 관리자모드</button>
+</div>
+
+<!-- ══════════ 투표 화면 ══════════ -->
+<div class="wrap" id="voterView">
   <div class="header">
     <div class="header-emblem">JL</div>
     <div class="header-t1">GOYANG JANGHANG ATERA</div>
     <div class="header-t2">고양장항아테라 입주예정자협의회</div>
   </div>
 
-  <!-- 투표 카드 -->
   <div class="card" id="voteCard">
     <div class="vote-status" id="voteStatus"><span class="vote-dot"></span>무기명 투표 중</div>
     <div class="vote-title">도로명 주소 선호도 투표</div>
@@ -92,7 +131,6 @@ img{max-width:100%;display:block}
       <label class="vote-opt" data-v="한가람로 155"><input type="radio" name="road" value="한가람로 155"><span class="vote-opt-label">① 한가람로 155</span></label>
       <label class="vote-opt" data-v="한류월드로 90"><input type="radio" name="road" value="한류월드로 90"><span class="vote-opt-label">② 한류월드로 90</span></label>
       <label class="vote-opt" data-v="장항한강로 150"><input type="radio" name="road" value="장항한강로 150"><span class="vote-opt-label">③ 장항한강로 150</span></label>
-
       <button class="vote-btn" id="submitBtn" onclick="submitVote()">투표하기</button>
     </div>
 
@@ -105,7 +143,6 @@ img{max-width:100%;display:block}
     <div id="resultBox" style="display:none;margin-top:20px"></div>
   </div>
 
-  <!-- 설문 배경 원문 -->
   <div class="sec-t">📄 설문 안내 전문</div>
   <div class="survey-img"><img src="images/survey_p1.png" alt="설문 배경"></div>
   <div class="survey-img"><img src="images/survey_p2.png" alt="설문 항목 설명 1"></div>
@@ -113,6 +150,54 @@ img{max-width:100%;display:block}
   <div class="survey-img"><img src="images/survey_p4.png" alt="설문 참조 사항"></div>
 
   <div class="footer">본 페이지는 법무법인 제이엘이 고양장항아테라 입주예정자협의회를 위해 제공합니다.</div>
+</div>
+
+<!-- ══════════ 관리자 잠금화면 ══════════ -->
+<div id="adminOverlay">
+  <div class="lock-card">
+    <div class="lock-t">🔒 관리자 접속코드</div>
+    <input type="password" id="pinInput" class="lock-input" placeholder="••••" maxlength="10" onkeydown="if(event.key==='Enter')unlockAdmin()">
+    <button class="lock-btn" onclick="unlockAdmin()">확인</button>
+    <button class="lock-cancel" onclick="closeAdminLock()">취소</button>
+  </div>
+</div>
+
+<!-- ══════════ 관리자 대시보드 ══════════ -->
+<div class="wrap" id="adminDash">
+  <div class="hd">
+    <div class="hd-t">📊 투표 관리자</div>
+    <div class="hd-actions">
+      <button class="icon-btn" onclick="loadAdminData()">↻ 새로고침</button>
+      <button class="icon-btn" onclick="closeAdmin()">✕ 닫기</button>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center">
+    <div class="card-t" style="text-align:left">전체 참여 현황</div>
+    <div class="donut-wrap">
+      <svg width="150" height="150" viewBox="0 0 150 150">
+        <circle cx="75" cy="75" r="60" fill="none" stroke="#DCE8E0" stroke-width="16"/>
+        <circle id="donutRing" cx="75" cy="75" r="60" fill="none" stroke="#0D5C30" stroke-width="16" stroke-dasharray="0 377" stroke-linecap="round" transform="rotate(-90 75 75)" style="transition:stroke-dasharray .8s ease"/>
+      </svg>
+      <div class="donut-center">
+        <div class="donut-pct" id="donutPct">0%</div>
+        <div class="donut-lb">참여율</div>
+      </div>
+    </div>
+    <div class="donut-sub" id="donutSub">총 760세대 중 0세대 참여</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-v" id="stTotal">-</div><div class="stat-lb">총 참여 수</div></div>
+    <div class="stat-card"><div class="stat-v" id="stRate">-</div><div class="stat-lb">참여율</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-t">선택지별 득표</div>
+    <div id="optResults"></div>
+  </div>
+
+  <button class="export-btn" onclick="exportCSV()">📥 엑셀(CSV) 다운로드</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -124,9 +209,40 @@ const GH_REPO = 'janghang-atera-vote';
 const VOTE_TITLE = '도로명 주소 선호도 투표';
 const VOTE_DEADLINE = new Date('2026-07-10T09:00:00+09:00');
 const OPTIONS = ['한가람로 155','한류월드로 90','장항한강로 150'];
+const TOTAL_UNITS = 760;
+const MASTER_PIN = '1234';
+const VOTED_KEY = 'janghang_road_vote_done';
 
 let selectedOption = null;
+let allVotes = [];
 
+/* ── 공통 ── */
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+async function fetchAllVoteIssues(){
+  let page = 1, items = [];
+  while(page <= 5){
+    const r = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/issues?labels=${encodeURIComponent('투표')}&state=all&per_page=100&page=${page}`);
+    if(!r.ok) break;
+    const batch = await r.json();
+    items = items.concat(batch);
+    if(batch.length < 100) break;
+    page++;
+  }
+  return items;
+}
+function parseVotes(items){
+  return items.map(issue => {
+    const m = (issue.body||'').match(/\*\*선택:\*\*\s*(.+)/);
+    if(!m) return null;
+    return { option: m[1].trim(), ts: issue.created_at };
+  }).filter(Boolean);
+}
+
+/* ── 투표자 화면 ── */
 document.querySelectorAll('.vote-opt').forEach(el=>{
   el.addEventListener('click', ()=>{
     document.querySelectorAll('.vote-opt').forEach(o=>o.classList.remove('checked'));
@@ -136,15 +252,7 @@ document.querySelectorAll('.vote-opt').forEach(el=>{
   });
 });
 
-function toast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2600);
-}
-
-function isClosed(){
-  return new Date() > VOTE_DEADLINE;
-}
+function isClosed(){ return new Date() > VOTE_DEADLINE; }
 
 function updateStatus(){
   const el = document.getElementById('voteStatus');
@@ -156,24 +264,10 @@ function updateStatus(){
   }
 }
 
-async function fetchTally(){
-  try{
-    const label = encodeURIComponent('투표');
-    const r = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/issues?labels=${label}&state=all&per_page=100`);
-    if(!r.ok) return null;
-    const items = await r.json();
-    const tally = {};
-    OPTIONS.forEach(o=>tally[o]=0);
-    items.forEach(issue=>{
-      const m = (issue.body||'').match(/\*\*선택:\*\*\s*(.+)/);
-      if(m && tally.hasOwnProperty(m[1].trim())) tally[m[1].trim()]++;
-    });
-    return tally;
-  }catch(e){ console.warn(e); return null; }
-}
-
-function renderResults(tally){
-  const total = Object.values(tally).reduce((a,b)=>a+b,0);
+function renderResults(votes){
+  const tally = {}; OPTIONS.forEach(o=>tally[o]=0);
+  votes.forEach(v=>{ if(tally.hasOwnProperty(v.option)) tally[v.option]++; });
+  const total = votes.length;
   const box = document.getElementById('resultBox');
   box.style.display = 'block';
   box.innerHTML = OPTIONS.map(opt=>{
@@ -186,15 +280,10 @@ function renderResults(tally){
   }).join('') + `<div class="result-total">총 ${total.toLocaleString()}표 참여</div>`;
 }
 
-const VOTED_KEY = 'janghang_road_vote_done';
-
 async function submitVote(){
   if(isClosed()){ toast('투표가 마감되었습니다'); return; }
   if(!selectedOption){ toast('선호하는 도로명을 선택해 주세요'); return; }
-  if(localStorage.getItem(VOTED_KEY)){
-    toast('이미 이 기기에서 투표하셨습니다');
-    return;
-  }
+  if(localStorage.getItem(VOTED_KEY)){ toast('이미 이 기기에서 투표하셨습니다'); return; }
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.textContent = '제출 중…';
@@ -210,21 +299,96 @@ async function submitVote(){
     document.getElementById('voteForm').style.display = 'none';
     document.getElementById('doneBox').style.display = 'block';
     document.getElementById('doneMsg').textContent = `"${selectedOption}" 에 투표하셨습니다.`;
-    const tally = await fetchTally();
-    if(tally) renderResults(tally);
+    const items = await fetchAllVoteIssues();
+    renderResults(parseVotes(items));
   }catch(e){
     btn.disabled = false; btn.textContent = '투표하기';
     toast('전송에 실패했습니다. 잠시 후 다시 시도해 주세요');
   }
 }
 
+/* ── 관리자 화면 ── */
+function openAdminLock(){
+  document.getElementById('adminOverlay').style.display = 'flex';
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinInput').focus();
+}
+function closeAdminLock(){
+  document.getElementById('adminOverlay').style.display = 'none';
+}
+function unlockAdmin(){
+  const v = document.getElementById('pinInput').value;
+  if(v === MASTER_PIN){
+    document.getElementById('adminOverlay').style.display = 'none';
+    document.getElementById('voterView').style.display = 'none';
+    document.getElementById('adminDash').style.display = 'block';
+    loadAdminData();
+  } else {
+    toast('접속코드가 올바르지 않습니다');
+  }
+}
+function closeAdmin(){
+  document.getElementById('adminDash').style.display = 'none';
+  document.getElementById('voterView').style.display = 'block';
+}
+
+async function loadAdminData(){
+  try{
+    const items = await fetchAllVoteIssues();
+    allVotes = parseVotes(items);
+    renderAdmin();
+  }catch(e){
+    console.warn(e);
+    toast('데이터를 불러오지 못했습니다');
+  }
+}
+
+function renderAdmin(){
+  const total = allVotes.length;
+  const rate = TOTAL_UNITS ? Math.round(total/TOTAL_UNITS*1000)/10 : 0;
+
+  document.getElementById('stTotal').textContent = total.toLocaleString() + '표';
+  document.getElementById('stRate').textContent = rate + '%';
+  document.getElementById('donutPct').textContent = rate + '%';
+  document.getElementById('donutSub').textContent = `총 ${TOTAL_UNITS.toLocaleString()}세대 중 ${total.toLocaleString()}세대 참여`;
+
+  const circ = 377, dash = circ * Math.min(rate,100) / 100;
+  document.getElementById('donutRing').setAttribute('stroke-dasharray', dash + ' ' + (circ-dash));
+
+  const optCounts = {}; OPTIONS.forEach(o=>optCounts[o]=0);
+  allVotes.forEach(v=>{ if(optCounts.hasOwnProperty(v.option)) optCounts[v.option]++; });
+
+  document.getElementById('optResults').innerHTML = OPTIONS.map(opt=>{
+    const cnt = optCounts[opt]||0;
+    const pct = total ? Math.round(cnt/total*1000)/10 : 0;
+    return `<div class="opt-row">
+      <div class="opt-top"><span>${opt}</span><span>${pct}% (${cnt}표)</span></div>
+      <div class="opt-bar"><div class="opt-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function exportCSV(){
+  if(!allVotes.length){ toast('내보낼 데이터가 없습니다'); return; }
+  const rows = [['선택','접수일시']];
+  [...allVotes].sort((a,b)=> new Date(a.ts) - new Date(b.ts))
+    .forEach(v=>rows.push([v.option, new Date(v.ts).toLocaleString('ko-KR')]));
+  const csv = '\ufeff' + rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = '고양장항아테라_도로명투표_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ── 초기화 ── */
 (async function init(){
   updateStatus();
-  const tally = await fetchTally();
-  if(tally){
-    const total = Object.values(tally).reduce((a,b)=>a+b,0);
-    if(total > 0 || isClosed()) renderResults(tally);
-  }
+  try{
+    const items = await fetchAllVoteIssues();
+    const votes = parseVotes(items);
+    if(votes.length > 0 || isClosed()) renderResults(votes);
+  }catch(e){ console.warn(e); }
 })();
 </script>
 </body>
